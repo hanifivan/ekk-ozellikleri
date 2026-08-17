@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>En Küçük Kareler Tahmin Edicilerinin Özellikleri — İnteraktif Ders Notu</title>
+<meta name="description" content="Ekonometri öğrencileri için EKK (OLS) tahmin edicilerinin özellikleri: sapmasızlık, varyans, etkinlik, tutarlılık ve Gauss-Markov teoremi. Canlı Monte Carlo benzetimleriyle interaktif ders notu.">
+<style>/*__KATEX_CSS__*/</style>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#182031; --muted:#5b6576;
+  --primary:#3457b2; --primary-soft:#e8edfa; --accent:#e08a1e; --accent-soft:#fbeeda;
+  --good:#2e9e6b; --good-soft:#e3f4ec; --bad:#d1495b; --bad-soft:#fae7ea;
+  --border:#e4e8ef; --shadow:0 1px 3px rgba(24,32,49,.06),0 8px 24px rgba(24,32,49,.05);
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+.katex{font-size:1.05em}
+a{color:var(--primary)}
+
+/* Layout */
+#layout{display:flex;min-height:100vh}
+#sidebar{width:270px;flex:0 0 270px;background:var(--card);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;padding:1.4rem 1rem}
+#content{flex:1;min-width:0;max-width:920px;margin:0 auto;padding:2rem 1.6rem 5rem}
+@media(max-width:880px){
+  #layout{flex-direction:column}
+  #sidebar{position:static;width:100%;height:auto;border-right:none;border-bottom:1px solid var(--border)}
+  #content{padding:1.2rem 1rem 4rem}
+}
+
+/* Sidebar */
+.logo{font-weight:800;font-size:1.02rem;letter-spacing:-.01em;margin-bottom:.2rem;color:var(--ink)}
+.logo small{display:block;font-weight:600;color:var(--muted);font-size:.72rem;letter-spacing:.02em;margin-top:.2rem}
+.nav-group{margin-top:1.2rem}
+.nav-group h4{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:.6rem .4rem .3rem}
+#sidebar a.navlink{display:block;padding:.4rem .6rem;border-radius:8px;color:var(--ink);text-decoration:none;font-size:.9rem;transition:background .15s}
+#sidebar a.navlink:hover{background:var(--primary-soft)}
+#sidebar a.navlink.active{background:var(--primary);color:#fff;font-weight:600}
+#sidebar a.navlink .n{display:inline-block;width:1.4em;color:var(--muted);font-variant-numeric:tabular-nums}
+#sidebar a.navlink.active .n{color:#dfe7fb}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#3457b2,#5b7fe0);color:#fff;border-radius:16px;padding:2rem 1.8rem;margin-bottom:2rem;box-shadow:var(--shadow)}
+.hero h1{margin:0 0 .5rem;font-size:1.7rem;line-height:1.2;letter-spacing:-.02em}
+.hero p{margin:0;opacity:.95;font-size:1rem;max-width:46rem}
+.hero .kicker{font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;opacity:.85;margin-bottom:.6rem;font-weight:600}
+.hero .tags{margin-top:1rem;display:flex;flex-wrap:wrap;gap:.4rem}
+.hero .tags span{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);padding:.25rem .6rem;border-radius:999px;font-size:.76rem}
+
+/* Sections */
+.section{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:1.6rem;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:1rem}
+.section-header{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:.7rem}
+.section-header .num{font-size:.78rem;font-weight:700;color:#fff;background:var(--primary);border-radius:7px;padding:.2rem .5rem;flex:0 0 auto}
+.section-header h2{margin:0;font-size:1.22rem;letter-spacing:-.01em}
+.section-body{padding:1.3rem 1.4rem}
+.section-body > p{margin:0 0 1rem}
+
+/* Intuition box */
+.sezgi{background:var(--accent-soft);border:1px solid #f2dcb8;border-left:4px solid var(--accent);border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0;display:flex;gap:.75rem;align-items:flex-start}
+.sezgi .ico{font-size:1.3rem;line-height:1;flex:0 0 auto}
+.sezgi b{color:#8a5a12}
+.sezgi p{margin:.2rem 0 0}
+
+/* Info / note boxes */
+.info-box{background:var(--primary-soft);border:1px solid #d3ddf6;border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0}
+.info-box.good{background:var(--good-soft);border-color:#c2e6d4}
+.info-box.warn{background:var(--bad-soft);border-color:#f0c9d1}
+.info-box p{margin:.3rem 0}
+.info-box .t{font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:.2rem}
+
+/* Formula block */
+.formula{background:#fbfcfe;border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin:1rem 0;overflow-x:auto}
+.formula.center{text-align:center}
+
+/* Collapsible proof */
+details.proof{border:1px solid var(--border);border-radius:10px;margin:1rem 0;background:#fbfcfe;overflow:hidden}
+details.proof>summary{cursor:pointer;padding:.75rem 1.1rem;font-weight:600;color:var(--primary);list-style:none;display:flex;align-items:center;gap:.5rem;user-select:none}
+details.proof>summary::-webkit-details-marker{display:none}
+details.proof>summary::before{content:"▶";font-size:.7rem;transition:transform .2s;color:var(--muted)}
+details.proof[open]>summary::before{transform:rotate(90deg)}
+details.proof>summary:hover{background:var(--primary-soft)}
+.proof-body{padding:.4rem 1.1rem 1.1rem;border-top:1px solid var(--border)}
+
+/* Controls */
+.controls{background:#fbfcfe;border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;margin:1rem 0;display:flex;flex-wrap:wrap;gap:1.1rem 1.6rem;align-items:flex-end}
+.ctrl{display:flex;flex-direction:column;gap:.35rem;min-width:150px;flex:1}
+.ctrl label{font-size:.8rem;font-weight:600;color:var(--muted);display:flex;justify-content:space-between;gap:.5rem}
+.ctrl label .v{color:var(--primary);font-variant-numeric:tabular-nums;font-family:var(--mono)}
+input[type=range]{width:100%;accent-color:var(--primary);cursor:pointer}
+.btn{background:var(--primary);color:#fff;border:none;border-radius:8px;padding:.5rem .9rem;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--sans);transition:filter .15s}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:#fff;color:var(--primary);border:1px solid var(--primary)}
+.btn.small{padding:.35rem .7rem;font-size:.8rem}
+.btn-row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+
+/* Chart */
+.chart-wrap{position:relative;height:300px;margin:1rem 0}
+.chart-wrap.sm{height:230px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+
+/* Stat cards */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.7rem;margin:1rem 0}
+.stat-card{background:#fbfcfe;border:1px solid var(--border);border-radius:10px;padding:.7rem .8rem;text-align:center}
+.stat-card .label{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.stat-card .value{font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;font-family:var(--mono);margin-top:.15rem}
+.stat-card .value.good{color:var(--good)}
+.stat-card .value.bad{color:var(--bad)}
+.stat-card .value.primary{color:var(--primary)}
+
+/* Dartboard */
+.dart-wrap{display:flex;flex-wrap:wrap;gap:1.4rem;align-items:center;justify-content:center;margin:1rem 0}
+canvas.dartboard{background:#fff;border:1px solid var(--border);border-radius:12px}
+.dart-legend{display:flex;flex-direction:column;gap:.6rem;font-size:.9rem;min-width:200px}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin:1rem 0}
+.preset{background:#fff;border:1px solid var(--border);border-radius:10px;padding:.7rem .8rem;cursor:pointer;text-align:left;transition:border-color .15s,box-shadow .15s;font-family:var(--sans)}
+.preset:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.preset.active{border-color:var(--primary);background:var(--primary-soft)}
+.preset b{display:block;font-size:.9rem;margin-bottom:.15rem}
+.preset small{color:var(--muted);font-size:.78rem}
+
+/* Quiz */
+.quiz{border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem;margin:1.2rem 0;background:#fbfcfe}
+.quiz .q{font-weight:600;margin-bottom:.7rem}
+.quiz .opt{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem;margin-bottom:.5rem;cursor:pointer;font-family:var(--sans);font-size:.92rem;transition:background .12s,border-color .12s}
+.quiz .opt:hover{border-color:var(--primary)}
+.quiz .opt.correct{background:var(--good-soft);border-color:var(--good);font-weight:600}
+.quiz .opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.quiz .fb{margin-top:.5rem;font-size:.9rem;padding:.6rem .8rem;border-radius:8px;display:none}
+.quiz .fb.show{display:block}
+.quiz .fb.ok{background:var(--good-soft);color:#1f6f4a}
+.quiz .fb.no{background:var(--bad-soft);color:#9e2b3a}
+
+/* Misc */
+.tag{display:inline-block;background:var(--primary-soft);color:var(--primary);border-radius:6px;padding:.1rem .45rem;font-size:.78rem;font-weight:600}
+.footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)}
+kbd{background:#eef1f6;border:1px solid var(--border);border-bottom-width:2px;border-radius:5px;padding:.05rem .35rem;font-family:var(--mono);font-size:.82em}
+ul.clean{margin:.6rem 0;padding-left:1.2rem}
+ul.clean li{margin:.3rem 0}
+</style>
+</head>
+<body>
+<div id="layout">
+<nav id="sidebar">
+  <div class="logo">EKK Tahmin Edicilerinin Özellikleri<small>İnteraktif Ekonometri Ders Notu</small></div>
+  <div class="nav-group">
+    <h4>Giriş</h4>
+    <a class="navlink" href="#s0"><span class="n">0</span>Neyi anlatıyoruz?</a>
+    <a class="navlink" href="#s1"><span class="n">1</span>Yenilemeli örnekleme</a>
+    <a class="navlink" href="#s2"><span class="n">2</span>Hedef tahtası: sapma ve varyans</a>
+  </div>
+  <div class="nav-group">
+    <h4>Küçük örnek özellikleri</h4>
+    <a class="navlink" href="#s3"><span class="n">3</span>Sapmasızlık</a>
+    <a class="navlink" href="#s4"><span class="n">4</span>En küçük varyans ve etkinlik</a>
+    <a class="navlink" href="#s5"><span class="n">5</span>Doğrusallık</a>
+    <a class="navlink" href="#s6"><span class="n">6</span>OHK: sapma-varyans dengesi</a>
+  </div>
+  <div class="nav-group">
+    <h4>Büyük örnek özellikleri</h4>
+    <a class="navlink" href="#s7"><span class="n">7</span>Tutarlılık</a>
+  </div>
+  <div class="nav-group">
+    <h4>EKK'ya özel</h4>
+    <a class="navlink" href="#s8"><span class="n">8</span>Gauss-Markov (DEST)</a>
+    <a class="navlink" href="#s9"><span class="n">9</span>Özet ve quiz</a>
+  </div>
+</nav>
+
+<main id="content">
+  <div class="hero">
+    <div class="kicker">Ekonometri · Regresyon Kuramı</div>
+    <h1>En Küçük Kareler Tahmin Edicilerinin Özellikleri</h1>
+    <p>Sapmasızlık, en küçük varyans, etkinlik, tutarlılık ve Gauss-Markov teoremini formüllerle değil, kendi çektiğin örneklerle anla. Aşağıdaki her benzetimi kaydırıcılarla oynatabilirsin.</p>
+    <div class="tags"><span>Monte Carlo</span><span>Sapma-Varyans</span><span>Gauss-Markov · DEST</span><span>Tutarlılık</span></div>
+  </div>
+
+  <!-- 0 -->
+  <section class="section" id="s0">
+    <div class="section-header"><span class="num">0</span><h2>Neyi anlatıyoruz?</h2></div>
+    <div class="section-body">
+      <p>Bir regresyonda gerçek eğim <span class="katex-inline" data-tex="\beta"></span> bilinmez. Elimizdeki örnekten onu <b>tahmin ederiz</b> ve buna <span class="katex-inline" data-tex="\hat{\beta}"></span> deriz. Peki bu tahmin ne kadar "iyi"? İyilik, tek bir örnekte değil, <b>aynı süreçten defalarca örnek çekseydik</b> tahminlerin nasıl dağılacağında gizlidir.</p>
+      <div class="sezgi"><div class="ico">🎯</div><div><b>Ana fikir:</b><p>Tahmin ediciyi bir ok atıcısı gibi düşün. Bir atış (tek örnek) fazla şey söylemez. Yüzlerce atışın nereye kümelendiğine bakarsan atıcının <b>ne kadar isabetli</b> (sapmasız) ve <b>ne kadar tutarlı</b> (düşük varyans) olduğunu görürsün.</p></div></div>
+      <p>Bu not boyunca tek bir düzen kullanacağız: <b>gerçek dünyayı biz kuruyoruz</b> (gerçek <span class="katex-inline" data-tex="\beta"></span>'yı biz seçiyoruz), sonra bilgisayardan yüzlerce örnek çekip her birinden <span class="katex-inline" data-tex="\hat{\beta}"></span> hesaplıyoruz. Tahminlerin dağılımına bakarak özellikleri gözümüzle görüyoruz.</p>
+      <div class="info-box"><div class="t">Kullanılan model</div>
+        <div class="formula center" data-tex="Y_i = \beta_0 + \beta_1 X_i + u_i, \qquad u_i \sim N(0,\sigma^2)"></div>
+        <p><span class="katex-inline" data-tex="X"></span> değerleri sabittir (örnekten örneğe değişmez), rastgelelik yalnızca hata terimi <span class="katex-inline" data-tex="u"></span>'dan gelir. Hedefimiz eğim <span class="katex-inline" data-tex="\beta_1"></span>'i tahmin etmek.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 -->
+  <section class="section" id="s1">
+    <div class="section-header"><span class="num">1</span><h2>Yenilemeli örnekleme: bütün notun motoru</h2></div>
+    <div class="section-body">
+      <p>Ekonometride "tahmin edici iyidir" derken kastettiğimiz şey, <b>varsayımsal yenilemeli örnekleme</b> sürecidir: aynı ana kütleden her biri <span class="katex-inline" data-tex="n"></span> gözlemli çok sayıda örnek çekilir, her örnekten <span class="katex-inline" data-tex="\hat{\beta}_1"></span> hesaplanıp <b>dağılımı</b> oluşturulur.</p>
+      <div class="sezgi"><div class="ico">🎲</div><div><b>Günlük benzetme:</b><p>Bir zar hilesiz mi? Bir kez atıp karar veremezsin. Yüzlerce kez atıp sonuçların dağılımına bakarsın. Tahmin edicide de öyle: tek örnek değil, "çok kez örnekleseydim ne olurdu" sorusu önemli.</p></div></div>
+      <p>Aşağıda gerçek eğimi <span class="katex-inline" data-tex="\beta_1=2{,}0"></span> seçtik. Her tıklamada yeni bir örnek çekilir ve o örneğin EKK doğrusu çizilir. Biriken <span class="katex-inline" data-tex="\hat{\beta}_1"></span> değerlerinin histogramı sağda oluşur.</p>
+      <div class="controls">
+        <div class="ctrl"><label>Örnek büyüklüğü n <span class="v" id="s1n_v">30</span></label><input type="range" id="s1n" min="10" max="200" value="30" step="5"></div>
+        <div class="ctrl"><label>Hata saçılımı σ <span class="v" id="s1s_v">4,0</span></label><input type="range" id="s1s" min="1" max="10" value="4" step="0.5"></div>
+        <div class="btn-row">
+          <button class="btn" id="s1_one">+1 örnek çek</button>
+          <button class="btn" id="s1_many">+200 örnek</button>
+          <button class="btn ghost small" id="s1_reset">Sıfırla</button>
+        </div>
+      </div>
+      <div class="grid2">
+        <div><div class="chart-wrap" id="s1scatter_wrap"><canvas id="s1scatter"></canvas></div><div style="text-align:center;font-size:.8rem;color:var(--muted)">Son çekilen örnek ve EKK doğrusu</div></div>
+        <div><div class="chart-wrap" id="s1hist_wrap"><canvas id="s1hist"></canvas></div><div style="text-align:center;font-size:.8rem;color:var(--muted)">Biriken β̂₁ dağılımı</div></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Çekilen örnek</div><div class="value primary" id="s1_count">0</div></div>
+        <div class="stat-card"><div class="label">Gerçek β₁</div><div class="value" id="s1_true">2,00</div></div>
+        <div class="stat-card"><div class="label">Ortalama β̂₁</div><div class="value good" id="s1_mean">–</div></div>
+        <div class="stat-card"><div class="label">Std. sapma</div><div class="value" id="s1_sd">–</div></div>
+      </div>
+      <div class="info-box"><p>Örnek sayısı arttıkça histogramın <b>merkezi gerçek değere</b> (2,00) oturur; bu sapmasızlıktır. Merkez etrafındaki <b>genişlik</b> ise varyanstır. Bir sonraki bölümde bu iki fikri tek bir görselle ayıracağız.</p></div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="section" id="s2">
+    <div class="section-header"><span class="num">2</span><h2>Hedef tahtası: sapma ve varyans</h2></div>
+    <div class="section-body">
+      <p>İyi bir tahmin edicinin iki ayrı erdemi vardır ve bunları karıştırmamak gerekir. <b>Sapma</b> (bias) tahminlerin ortalamasının gerçek değerden ne kadar kaydığıdır. <b>Varyans</b> tahminlerin birbirinden ne kadar saçıldığıdır. Bir ok atıcısının hedef tahtası bu ayrımı bir bakışta gösterir.</p>
+      <div class="sezgi"><div class="ico">🎯</div><div><b>Hedef tahtası:</b><p>Tahtanın <b>merkezi</b> gerçek <span class="katex-inline" data-tex="\beta"></span> değeridir. Her <b>ok</b> bir örnekten gelen bir tahmindir. Oklar merkezin dışında bir yere kümeleniyorsa <b>sapma</b> var; oklar geniş bir alana yayılıyorsa <b>varyans</b> yüksek demektir.</p></div></div>
+      <div class="preset-grid">
+        <button class="preset active" data-bias="0" data-spread="0.35"><b>İsabetli ✓</b><small>Sapmasız + düşük varyans — ideal</small></button>
+        <button class="preset" data-bias="0" data-spread="1.1"><b>Sapmasız ama dağınık</b><small>Ortalama doğru, tek atış güvenilmez</small></button>
+        <button class="preset" data-bias="1.4" data-spread="0.35"><b>Tutarlı ama kaymış</b><small>Düşük varyans, ama sistematik hata</small></button>
+        <button class="preset" data-bias="1.4" data-spread="1.1"><b>Kötü</b><small>Hem kaymış hem dağınık</small></button>
+      </div>
+      <div class="dart-wrap">
+        <canvas class="dartboard" id="dart" width="300" height="300"></canvas>
+        <div class="dart-legend">
+          <div class="ctrl"><label>Sapma (bias) <span class="v" id="dart_b_v">0,0</span></label><input type="range" id="dart_b" min="0" max="2" value="0" step="0.1"></div>
+          <div class="ctrl"><label>Varyans (saçılım) <span class="v" id="dart_s_v">0,35</span></label><input type="range" id="dart_s" min="0.15" max="1.5" value="0.35" step="0.05"></div>
+          <div class="stat-card"><div class="label">Ortalama hata karesi (OHK)</div><div class="value primary" id="dart_mse">–</div></div>
+          <button class="btn small" id="dart_shoot">Yeniden at</button>
+        </div>
+      </div>
+      <div class="info-box"><p>Dikkat: <b>sapmasızlık tek başına yetmez.</b> Sapmasız ama çok dağınık bir tahmin edicide, elindeki <b>tek</b> örnekten gelen tahmin gerçek değerden çok uzak olabilir. İyi tahmin, merkeze hem doğru hem sık isabet edendir. Bu iki erdemi tek sayıda birleştiren ölçüt <b>OHK</b>'dır ve onu 6. bölümde ele alacağız.</p></div>
+      <p>Şimdi bu iki erdemi tek tek, kendi benzetimleriyle inceleyelim.</p>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="section" id="s3">
+    <div class="section-header"><span class="num">3</span><h2>Sapmasızlık</h2></div>
+    <div class="section-body">
+      <div class="sezgi"><div class="ico">⚖️</div><div><b>Sezgi:</b><p>Sapmasız tahmin edici, hep 2 kilo fazla tartan bir terazi <b>değildir</b>. Bazen fazla, bazen az gösterir ama <b>ortalamada</b> doğruyu verir. "Ortalama olarak haklı" demektir.</p></div></div>
+      <p>Bir tahmin edicinin <b>sapması</b>, beklenen değeri ile gerçek parametre arasındaki farktır:</p>
+      <div class="formula center" data-tex="\text{Sapma}(\hat{\beta}) = E(\hat{\beta}) - \beta"></div>
+      <p>Eğer <span class="katex-inline" data-tex="E(\hat{\beta}) = \beta"></span> ise, yani sapma sıfırsa, tahmin edici <b>sapmasızdır</b>. Örnek sayısı arttıkça sapmasız tahminlerin ortalaması gerçek değere oturur.</p>
+      <p>Aşağıda iki tahmin ediciyi yan yana koyduk: biri sapmasız (gerçek değeri hedefler), diğerine yapay bir sapma ekledik. Kaydırıcıyla sapmayı büyütüp dağılımın nasıl kaydığını izle.</p>
+      <div class="controls">
+        <div class="ctrl"><label>İkinci tahmin edicinin sapması <span class="v" id="s3b_v">0,8</span></label><input type="range" id="s3b" min="0" max="2" value="0.8" step="0.1"></div>
+        <div class="btn-row"><button class="btn" id="s3_run">500 örnek çek</button></div>
+      </div>
+      <div class="chart-wrap" id="s3_wrap"><canvas id="s3chart"></canvas></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Sapmasız: ort.</div><div class="value good" id="s3_m1">–</div></div>
+        <div class="stat-card"><div class="label">Sapmalı: ort.</div><div class="value bad" id="s3_m2">–</div></div>
+        <div class="stat-card"><div class="label">Gerçek β₁</div><div class="value">2,00</div></div>
+      </div>
+      <details class="proof"><summary>Formal tanım</summary><div class="proof-body">
+        <p><span class="katex-inline" data-tex="\hat{\beta}"></span>, <span class="katex-inline" data-tex="\beta"></span>'nın sapmasız tahmin edicisidir ancak ve ancak</p>
+        <div class="formula center" data-tex="E(\hat{\beta}) = \beta \quad\Longleftrightarrow\quad \text{Sapma}(\hat{\beta}) = 0."></div>
+        <p>Sapmasızlık aranan bir özelliktir ama <b>kendi başına</b> çok da değerli değildir; ancak küçük bir varyansla birleşince önem kazanır.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="section" id="s4">
+    <div class="section-header"><span class="num">4</span><h2>En küçük varyans ve etkinlik</h2></div>
+    <div class="section-body">
+      <div class="sezgi"><div class="ico">🎯</div><div><b>Sezgi:</b><p>İki nişancı da ortalamada merkezi vuruyor (ikisi de sapmasız). Ama birinin okları avuç içi kadar bir alana, diğerininki tüm tahtaya yayılıyor. <b>Dar olan daha iyidir</b>: onun tek atışına daha çok güvenirsin. İşte "en küçük varyanslı" budur.</p></div></div>
+      <p>Bir tahmin edici, aynı parametrenin başka herhangi bir tahmin edicisiyle karşılaştırıldığında <b>en küçük varyansa</b> sahipse <b>en iyi</b> (en küçük varyanslı) tahmin edicidir:</p>
+      <div class="formula center" data-tex="\mathrm{Var}(\hat{\beta}) < \mathrm{Var}(\tilde{\beta})"></div>
+      <p>Eğer bir tahmin edici <b>hem sapmasız hem</b> de sapmasızlar arasında en küçük varyanslıysa, ona <b>etkin</b> tahmin edici denir. Aşağıda iki sapmasız tahmin ediciyi kıyaslıyoruz; ikincinin varyansını kaydırıcıyla büyüt.</p>
+      <div class="controls">
+        <div class="ctrl"><label>İkinci tahmin edicinin göreli varyansı <span class="v" id="s4v_v">2,0×</span></label><input type="range" id="s4v" min="1" max="5" value="2" step="0.25"></div>
+        <div class="btn-row"><button class="btn" id="s4_run">800 örnek çek</button></div>
+      </div>
+      <div class="chart-wrap" id="s4_wrap"><canvas id="s4chart"></canvas></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Etkin: std. sapma</div><div class="value good" id="s4_sd1">–</div></div>
+        <div class="stat-card"><div class="label">Diğeri: std. sapma</div><div class="value bad" id="s4_sd2">–</div></div>
+        <div class="stat-card"><div class="label">İkisi de sapmasız mı?</div><div class="value primary" id="s4_unb">Evet</div></div>
+      </div>
+      <div class="info-box warn"><p><b>Tuzak:</b> Varyansı küçük ama sapması büyük bir tahmin edici, gerçek değerden uzak bir nokta etrafında sıkışıp kalabilir. Düşük varyans ancak sapmasızlıkla birleşince erdemdir.</p></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="section" id="s5">
+    <div class="section-header"><span class="num">5</span><h2>Doğrusallık</h2></div>
+    <div class="section-body">
+      <div class="sezgi"><div class="ico">➕</div><div><b>Sezgi:</b><p>Bir tahmin, gözlemlerin <b>ağırlıklı toplamıysa</b> doğrusaldır. En tanıdık örnek: örnek ortalaması. Her gözleme eşit <span class="katex-inline" data-tex="1/n"></span> ağırlığı verip toplarsın; işte doğrusal tahmin edici budur.</p></div></div>
+      <p>Bir tahmin edici, örnekteki gözlemlerin doğrusal bir fonksiyonuysa <b>doğrusal</b> sayılır:</p>
+      <div class="formula center" data-tex="\hat{\beta} = k_1 Y_1 + k_2 Y_2 + \cdots + k_n Y_n = \sum_i k_i Y_i"></div>
+      <p>Buradaki <span class="katex-inline" data-tex="k_i"></span> ağırlıkları sabittir (örnekten örneğe değişmez). Örnek ortalamasında bütün ağırlıklar eşittir:</p>
+      <div class="formula center" data-tex="\bar{Y} = \tfrac{1}{n}Y_1 + \tfrac{1}{n}Y_2 + \cdots + \tfrac{1}{n}Y_n = \sum_i \tfrac{1}{n} Y_i"></div>
+      <p>EKK eğim tahmincisi de <span class="katex-inline" data-tex="Y_i"></span>'lerin doğrusal bir fonksiyonudur. Aşağıda ağırlıkların dağılımını görebilirsin; <span class="katex-inline" data-tex="X"></span> ortalamadan uzaklaştıkça gözlemin ağırlığı artar.</p>
+      <div class="formula center" data-tex="\hat{\beta}_1 = \sum_i k_i Y_i, \qquad k_i = \frac{x_i}{\sum_i x_i^2}, \quad x_i = X_i - \bar{X}"></div>
+      <div class="chart-wrap sm" id="s5_wrap"><canvas id="s5chart"></canvas></div>
+      <div style="text-align:center;font-size:.8rem;color:var(--muted)">EKK eğim tahmincisinde her gözlemin ağırlığı kᵢ</div>
+      <div class="info-box"><p><span class="katex-inline" data-tex="X_i"></span>'ler sabit varsayıldığından <span class="katex-inline" data-tex="k_i"></span> ağırlıkları da örnekten örneğe değişmez; bu yüzden <span class="katex-inline" data-tex="\hat{\beta}_1"></span> sadece <span class="katex-inline" data-tex="Y"></span> değerlerine bağlı doğrusal bir tahmin edicidir. Bu, birazdan gelecek Gauss-Markov teoreminin ön koşuludur.</p></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="section" id="s6">
+    <div class="section-header"><span class="num">6</span><h2>OHK: sapma ile varyansın dengesi</h2></div>
+    <div class="section-body">
+      <div class="sezgi"><div class="ico">⚖️</div><div><b>Sezgi:</b><p>Bazen küçük bir sapmayı kabul edip karşılığında çok daha düşük varyans alabilirsin. Toplam hatayı tek sayıda ölçmek istersen <b>ortalama hata karesi (OHK)</b> kullanılır: hem merkeze uzaklığı hem saçılımı birlikte cezalandırır.</p></div></div>
+      <p>OHK, tahmin edicinin gerçek parametreden farkının karesinin beklenen değeridir ve şu temiz kimliğe ayrışır:</p>
+      <div class="formula center" data-tex="\mathrm{OHK}(\hat{\beta}) = E\big[(\hat{\beta}-\beta)^2\big] = \mathrm{Var}(\hat{\beta}) + \big[\text{Sapma}(\hat{\beta})\big]^2"></div>
+      <p>Aşağıda varyans ve sapmayı ayrı ayrı ayarla; OHK'nın nasıl oluştuğunu ve dağılımın gerçek değere göre nereye oturduğunu izle.</p>
+      <div class="controls">
+        <div class="ctrl"><label>Varyans bileşeni <span class="v" id="s6v_v">0,50</span></label><input type="range" id="s6v" min="0.1" max="2" value="0.5" step="0.05"></div>
+        <div class="ctrl"><label>Sapma bileşeni <span class="v" id="s6b_v">0,60</span></label><input type="range" id="s6b" min="0" max="2" value="0.6" step="0.05"></div>
+      </div>
+      <div class="grid2">
+        <div class="chart-wrap sm" id="s6dist_wrap"><canvas id="s6dist"></canvas></div>
+        <div class="chart-wrap sm" id="s6bar_wrap"><canvas id="s6bar"></canvas></div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Varyans</div><div class="value" id="s6_var">–</div></div>
+        <div class="stat-card"><div class="label">Sapma²</div><div class="value" id="s6_bias2">–</div></div>
+        <div class="stat-card"><div class="label">OHK toplam</div><div class="value primary" id="s6_mse">–</div></div>
+      </div>
+      <details class="proof"><summary>İspat: OHK = Varyans + Sapma²</summary><div class="proof-body">
+        <p><span class="katex-inline" data-tex="E(\hat{\beta})"></span>'yı ekleyip çıkararak açalım:</p>
+        <div class="formula center" data-tex="\mathrm{OHK} = E\big[(\hat{\beta}-\beta)^2\big] = E\Big[\big(\hat{\beta}-E(\hat{\beta}) + E(\hat{\beta})-\beta\big)^2\Big]"></div>
+        <p>Kareyi açtığımızda üç terim çıkar:</p>
+        <div class="formula center" data-tex="= \underbrace{E\big[(\hat{\beta}-E(\hat{\beta}))^2\big]}_{\mathrm{Var}(\hat{\beta})} + \underbrace{\big[E(\hat{\beta})-\beta\big]^2}_{\text{Sapma}^2} + 2\,E\big[(\hat{\beta}-E(\hat{\beta}))(E(\hat{\beta})-\beta)\big]"></div>
+        <p>Son çapraz terim sıfırdır, çünkü <span class="katex-inline" data-tex="E(\hat{\beta})-\beta"></span> bir sabittir ve <span class="katex-inline" data-tex="E[\hat{\beta}-E(\hat{\beta})] = 0"></span>:</p>
+        <div class="formula center" data-tex="2\big[E(\hat{\beta})-\beta\big]\,\underbrace{E\big[\hat{\beta}-E(\hat{\beta})\big]}_{=\,0} = 0."></div>
+        <p>Böylece <span class="katex-inline" data-tex="\mathrm{OHK}(\hat{\beta}) = \mathrm{Var}(\hat{\beta}) + [\text{Sapma}(\hat{\beta})]^2"></span> elde edilir. <span class="tag">∎</span></p>
+      </div></details>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="section" id="s7">
+    <div class="section-header"><span class="num">7</span><h2>Tutarlılık (büyük örnek özelliği)</h2></div>
+    <div class="section-body">
+      <div class="sezgi"><div class="ico">📷</div><div><b>Sezgi:</b><p>Tutarlılık, bir fotoğraf makinesinin ışık arttıkça netleşmesi gibidir. Örnek büyüklüğü <span class="katex-inline" data-tex="n"></span> büyüdükçe hem sapma hem varyans erir ve dağılım gerçek değerin üstünde tek bir noktaya çöker.</p></div></div>
+      <p>Bir tahmin edici, <span class="katex-inline" data-tex="n\to\infty"></span> iken iki koşulu birden sağlıyorsa <b>tutarlıdır</b>:</p>
+      <div class="formula center" data-tex="\lim_{n\to\infty} E(\hat{\beta}) = \beta \qquad \text{ve} \qquad \lim_{n\to\infty} \mathrm{Var}(\hat{\beta}) = 0."></div>
+      <p>Yani asimtotik olarak sapmasız olması <b>ve</b> varyansının sıfıra gitmesi gerekir. Kaydırıcıyla <span class="katex-inline" data-tex="n"></span>'i büyüt; dağılımın gerçek değere doğru daralıp yükseldiğini izle.</p>
+      <div class="controls">
+        <div class="ctrl"><label>Örnek büyüklüğü n <span class="v" id="s7n_v">20</span></label><input type="range" id="s7n" min="10" max="1000" value="20" step="10"></div>
+        <div class="btn-row"><button class="btn" id="s7_run">Bu n için 600 örnek çek</button><button class="btn ghost small" id="s7_overlay">Katmanları temizle</button></div>
+      </div>
+      <div class="chart-wrap" id="s7_wrap"><canvas id="s7chart"></canvas></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Şu anki n</div><div class="value primary" id="s7_n">20</div></div>
+        <div class="stat-card"><div class="label">Std. sapma</div><div class="value" id="s7_sd">–</div></div>
+        <div class="stat-card"><div class="label">Ortalama β̂₁</div><div class="value good" id="s7_mean">–</div></div>
+      </div>
+      <div class="info-box"><p>Farklı <span class="katex-inline" data-tex="n"></span> değerleri için çektiğin dağılımlar üst üste birikir. <span class="katex-inline" data-tex="n"></span> büyüdükçe eğrilerin giderek daralıp sivrildiğini, hepsinin aynı merkeze (gerçek değere) yaslandığını göreceksin. Sapmasızlık örnek büyüklüğünden bağımsızdı; tutarlılık ise tam da büyük örnekle ilgilidir.</p></div>
+      <details class="proof"><summary>Asimtotik sapmasızlık ile tutarlılık farkı</summary><div class="proof-body">
+        <p>Sonlu örnekte sapmasız olan bir tahmin edici aynı zamanda asimtotik sapmasızdır, ama tersi doğru değildir: asimtotik sapmasız bir tahmin edici sonlu örnekte sapmalı olabilir. Tutarlılık, asimtotik sapmasızlığa ek olarak varyansın da sıfıra gitmesini ister; yani dağılımın hem yerinde durması hem de bir noktaya büzülmesi gerekir.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="section" id="s8">
+    <div class="section-header"><span class="num">8</span><h2>Gauss-Markov teoremi: EKK neden DEST?</h2></div>
+    <div class="section-body">
+      <div class="sezgi"><div class="ico">🏆</div><div><b>Sezgi:</b><p>Doğrusal ve sapmasız tahmin ediciler arasında bir yarışma düzenlesek, kazanan hep EKK olur: en dar dağılıma (en küçük varyansa) sahip olan odur. İngilizcesi BLUE, Türkçesi <b>DEST</b>: Doğrusal En iyi Sapmasız Tahmin edici.</p></div></div>
+      <p><b>Gauss-Markov teoremi:</b> Hata terimi <span class="katex-inline" data-tex="u"></span>'nun ortalaması sıfır ve varyansı sabit olduğunda, EKK tahmin edicileri bütün <b>doğrusal ve sapmasız</b> tahmin ediciler arasında <b>en küçük varyanslı</b> olandır.</p>
+      <p>Aşağıda EKK ile makul ama alternatif bir doğrusal sapmasız tahmin ediciyi (uçtaki noktalara farklı ağırlık veren bir kestirici) yarıştırıyoruz. İkisi de sapmasız; ama hangisinin dağılımı daha dar?</p>
+      <div class="controls">
+        <div class="btn-row"><button class="btn" id="s8_run">1000 örnek çek</button></div>
+      </div>
+      <div class="chart-wrap" id="s8_wrap"><canvas id="s8chart"></canvas></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">EKK: ort.</div><div class="value good" id="s8_m1">–</div></div>
+        <div class="stat-card"><div class="label">EKK: std. sapma</div><div class="value good" id="s8_sd1">–</div></div>
+        <div class="stat-card"><div class="label">Alternatif: ort.</div><div class="value" id="s8_m2">–</div></div>
+        <div class="stat-card"><div class="label">Alternatif: std. sapma</div><div class="value bad" id="s8_sd2">–</div></div>
+      </div>
+      <div class="info-box good"><p>İki tahmin edicinin de ortalaması gerçek değere oturur (ikisi de sapmasız). Ama <b>EKK'nın std. sapması daha küçüktür</b>: dağılımı daha dar, daha sivri. İşte EKK'yı seçmenin temel nedeni budur.</p></div>
+      <details class="proof"><summary>DEST'in dört koşulu</summary><div class="proof-body">
+        <ul class="clean">
+          <li><b>Doğrusal:</b> <span class="katex-inline" data-tex="\hat{\beta}_1 = \sum_i k_i Y_i"></span> biçimindedir.</li>
+          <li><b>Sapmasız:</b> <span class="katex-inline" data-tex="E(\hat{\beta}_1) = \beta_1"></span>.</li>
+          <li><b>En iyi:</b> Öteki tüm doğrusal sapmasız tahmin edicilerden küçük varyanslıdır.</li>
+          <li><b>Teorem:</b> Bu üç özelliği EKK'nın sağladığını gösteren sonuç Gauss-Markov teoremidir.</li>
+        </ul>
+      </div></details>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="section" id="s9">
+    <div class="section-header"><span class="num">9</span><h2>Özet ve mini quiz</h2></div>
+    <div class="section-body">
+      <p>Özet tablosu: her özellik, tek cümlelik sezgisi ve formal koşuluyla.</p>
+      <div class="info-box"><ul class="clean">
+        <li><b>Sapmasızlık:</b> ortalamada doğru — <span class="katex-inline" data-tex="E(\hat{\beta})=\beta"></span>.</li>
+        <li><b>En küçük varyans:</b> en dar dağılım — <span class="katex-inline" data-tex="\mathrm{Var}(\hat{\beta})<\mathrm{Var}(\tilde{\beta})"></span>.</li>
+        <li><b>Etkinlik:</b> sapmasızlar arasında en küçük varyanslı.</li>
+        <li><b>Doğrusallık:</b> gözlemlerin ağırlıklı toplamı — <span class="katex-inline" data-tex="\hat{\beta}=\sum k_i Y_i"></span>.</li>
+        <li><b>OHK:</b> toplam hata — <span class="katex-inline" data-tex="\mathrm{Var}+\text{Sapma}^2"></span>.</li>
+        <li><b>Tutarlılık:</b> <span class="katex-inline" data-tex="n\to\infty"></span> iken sapma ve varyans sıfıra gider.</li>
+        <li><b>DEST (Gauss-Markov):</b> EKK, doğrusal sapmasızlar arasında en iyisidir.</li>
+      </ul></div>
+      <div class="quiz" id="quiz"></div>
+    </div>
+  </section>
+
+  <div class="footer">
+    Ekonometri İnteraktif Ders Notu · Kaynak: "En Küçük Kareler Tahmin Edicilerinin Özellikleri" · Bütün benzetimler tarayıcında, çevrimdışı çalışır.
+  </div>
+</main>
+</div>
+
+<script>/*__CHARTJS__*/</script>
+<script>/*__KATEX_JS__*/</script>
+<script>/*__APP_JS__*/</script>
+</body>
+</html>
