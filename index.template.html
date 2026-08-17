@@ -163,11 +163,12 @@ ul.clean li{margin:.3rem 0}
   <div class="nav-group">
     <h4>Büyük örnek özellikleri</h4>
     <a class="navlink" href="#s7"><span class="n">7</span>Tutarlılık</a>
+    <a class="navlink" href="#s8"><span class="n">8</span>Asimtotik etkinlik</a>
   </div>
   <div class="nav-group">
     <h4>EKK'ya özel</h4>
-    <a class="navlink" href="#s8"><span class="n">8</span>Gauss-Markov (DEST)</a>
-    <a class="navlink" href="#s9"><span class="n">9</span>Özet ve quiz</a>
+    <a class="navlink" href="#s9"><span class="n">9</span>Gauss-Markov (DEST)</a>
+    <a class="navlink" href="#s10"><span class="n">10</span>Özet ve quiz</a>
   </div>
 </nav>
 
@@ -375,7 +376,31 @@ ul.clean li{margin:.3rem 0}
 
   <!-- 8 -->
   <section class="section" id="s8">
-    <div class="section-header"><span class="num">8</span><h2>Gauss-Markov teoremi: EKK neden DEST?</h2></div>
+    <div class="section-header"><span class="num">8</span><h2>Asimtotik etkinlik (büyük örnek özelliği)</h2></div>
+    <div class="section-body">
+      <div class="sezgi"><div class="ico">🏁</div><div><b>Sezgi:</b><p>İki koşucu da bitiş çizgisine varıyor (ikisi de tutarlı), ama biri hep daha hızlı. Asimtotik etkinlik, tutarlı tahmin ediciler arasında büyük örnekte <b>en dar dağılıma</b> ulaşan, yani gerçek değere en çabuk sivrilen tahmin edicidir.</p></div></div>
+      <p>Bir tahmin edici <b>asimtotik etkindir</b> eğer: (1) tutarlıysa <b>ve</b> (2) başka herhangi bir tutarlı tahmin ediciye göre daha küçük asimtotik varyansı varsa.</p>
+      <p>Aşağıda iki <b>tutarlı</b> tahmin ediciyi yarıştırıyoruz. <span class="tag">Etkin</span> tahmin edici bütün örneği kullanan EKK; <span class="tag">daha az etkin</span> olan ise örneğin yalnız yarısını (her ikinci gözlemi) kullanan EKK. İkisi de <span class="katex-inline" data-tex="n\to\infty"></span> iken gerçek değere çöker, ama yarım veri kullanan her <span class="katex-inline" data-tex="n"></span>'de daha geniştir. <span class="katex-inline" data-tex="n"></span>'i büyüt: ikisi de daralır, aradaki varyans oranı yaklaşık sabit kalır.</p>
+      <div class="controls">
+        <div class="ctrl"><label>Örnek büyüklüğü n <span class="v" id="ae_n_v">40</span></label><input type="range" id="ae_n" min="20" max="1000" value="40" step="20"></div>
+        <div class="btn-row"><button class="btn" id="ae_run">Bu n için 600 örnek çek</button></div>
+      </div>
+      <div class="chart-wrap" id="ae_wrap"><canvas id="aechart"></canvas></div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Etkin (tüm veri): std. sapma</div><div class="value good" id="ae_sd1">–</div></div>
+        <div class="stat-card"><div class="label">Yarım veri: std. sapma</div><div class="value bad" id="ae_sd2">–</div></div>
+        <div class="stat-card"><div class="label">Varyans oranı</div><div class="value primary" id="ae_ratio">–</div></div>
+      </div>
+      <div class="info-box"><p>İkisi de tutarlıdır: <span class="katex-inline" data-tex="n"></span> büyüdükçe iki std. sapma da küçülür. Ama varyans oranı (<span class="katex-inline" data-tex="\approx 2"></span>) yaklaşık sabit kalır; yani EKK her ölçekte daha etkindir. Tutarlılık "sonunda doğruya varmak", asimtotik etkinlik ise "en hızlı varmak" demektir.</p></div>
+      <details class="proof"><summary>Tutarlılık ile asimtotik etkinlik farkı</summary><div class="proof-body">
+        <p>Tutarlılık bir eşik koşuludur: tahmin edici sonunda gerçek değere yakınsıyor mu? Asimtotik etkinlik ise tutarlı tahmin ediciler arasında bir <b>sıralama</b> yapar: aynı örnek büyüklüğünde hangisi daha küçük varyanslı? Yarım veri kullanan tahminci tutarlıdır ama bilgiyi savurgan kullandığı için asimtotik olarak daha az etkindir.</p>
+      </div></details>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="section" id="s9">
+    <div class="section-header"><span class="num">9</span><h2>Gauss-Markov teoremi: EKK neden DEST?</h2></div>
     <div class="section-body">
       <div class="sezgi"><div class="ico">🏆</div><div><b>Sezgi:</b><p>Doğrusal ve sapmasız tahmin ediciler arasında bir yarışma düzenlesek, kazanan hep EKK olur: en dar dağılıma (en küçük varyansa) sahip olan odur. İngilizcesi BLUE, Türkçesi <b>DEST</b>: Doğrusal En iyi Sapmasız Tahmin edici.</p></div></div>
       <p><b>Gauss-Markov teoremi:</b> Hata terimi <span class="katex-inline" data-tex="u"></span>'nun ortalaması sıfır ve varyansı sabit olduğunda, EKK tahmin edicileri bütün <b>doğrusal ve sapmasız</b> tahmin ediciler arasında <b>en küçük varyanslı</b> olandır.</p>
@@ -403,8 +428,8 @@ ul.clean li{margin:.3rem 0}
   </section>
 
   <!-- 9 -->
-  <section class="section" id="s9">
-    <div class="section-header"><span class="num">9</span><h2>Özet ve mini quiz</h2></div>
+  <section class="section" id="s10">
+    <div class="section-header"><span class="num">10</span><h2>Özet ve mini quiz</h2></div>
     <div class="section-body">
       <p>Özet tablosu: her özellik, tek cümlelik sezgisi ve formal koşuluyla.</p>
       <div class="info-box"><ul class="clean">

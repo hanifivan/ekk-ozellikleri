@@ -339,7 +339,43 @@ function s7Run(){
 function s7Clear(){ S7.chart.data.datasets=[]; S7.idx=0; S7.chart.update(); }
 
 /* ============================================================
-   BÖLÜM 8 — Gauss-Markov (EKK vs alternatif)
+   BÖLÜM 8 — Asimtotik etkinlik (tüm veri vs yarım veri)
+   ============================================================ */
+var SAE=null;
+// Tutarlı ama daha az etkin tahmin edici: örneğin yalnız yarısını (her ikinci gözlem) kullanan EKK
+function halfSlope(xs, ys){
+  var xh=[], yh=[]; for(var i=0;i<xs.length;i+=2){ xh.push(xs[i]); yh.push(ys[i]); }
+  return olsSlope(xh, yh);
+}
+function saeInit(){
+  var ctx=document.getElementById("aechart").getContext("2d");
+  SAE=new Chart(ctx,{ type:"line",
+    data:{ datasets:[
+      {label:"Etkin: tüm veri (EKK)", data:[], borderColor:C.good, backgroundColor:C.goodSoft, fill:true, tension:.3, pointRadius:0, borderWidth:2.2},
+      {label:"Yarım veri (tutarlı, daha az etkin)", data:[], borderColor:C.bad, backgroundColor:C.badSoft, fill:true, tension:.3, pointRadius:0, borderWidth:2}
+    ]},
+    options:{ maintainAspectRatio:false, parsing:false, scales:{
+      x:{type:"linear", min:0.5, max:3.5, title:{display:true,text:"β̂₁"}, grid:{color:C.grid}},
+      y:{title:{display:true,text:"yoğunluk"}, ticks:{display:false}, grid:{color:C.grid}} },
+      plugins:{legend:{position:"top"}} },
+    plugins:[trueLinePlugin(function(){return TRUE_B1;},"β₁=2")]
+  });
+}
+function saeRun(){
+  var n=+document.getElementById("ae_n").value, sigma=4, xs=makeX(n), a=[], b=[];
+  for(var i=0;i<600;i++){ var ys=drawSample(xs,sigma); a.push(olsSlope(xs,ys)); b.push(halfSlope(xs,ys)); }
+  SAE.data.datasets[0].data=density(a,0.5,3.5,80);
+  SAE.data.datasets[1].data=density(b,0.5,3.5,80);
+  SAE.update();
+  var sd1=sd(a), sd2=sd(b);
+  document.getElementById("ae_sd1").textContent=tr(sd1,3);
+  document.getElementById("ae_sd2").textContent=tr(sd2,3);
+  document.getElementById("ae_ratio").textContent=(sd1>0?tr((sd2*sd2)/(sd1*sd1),2):"–")+"×";
+  document.getElementById("ae_n_v").textContent=n;
+}
+
+/* ============================================================
+   BÖLÜM 9 — Gauss-Markov (EKK vs alternatif)
    ============================================================ */
 var S8=null;
 // Alternatif doğrusal sapmasız tahmin edici: yalnız iki uç noktayı kullanır
@@ -468,9 +504,13 @@ function init(){
   bindLabel("s7n","s7n_v",function(x){return x.toString();});
   document.getElementById("s7_run").addEventListener("click", s7Run);
   document.getElementById("s7_overlay").addEventListener("click", s7Clear); s7Run();
-  // Bölüm 8
+  // Bölüm 8 — Asimtotik etkinlik
+  saeInit();
+  bindLabel("ae_n","ae_n_v",function(x){return x.toString();});
+  document.getElementById("ae_run").addEventListener("click", saeRun); saeRun();
+  // Bölüm 9 — Gauss-Markov
   s8Init(); document.getElementById("s8_run").addEventListener("click", s8Run); s8Run();
-  // Bölüm 9
+  // Bölüm 10 — Quiz
   quizInit();
   // Genel
   initScrollSpy();
