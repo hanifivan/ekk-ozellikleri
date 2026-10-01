@@ -1,5 +1,9 @@
 # En Küçük Kareler Tahmin Edicilerinin Özellikleri — İnteraktif Ders Notu
 
+**Hazırlayan: Doç. Dr. M. Hanifi VAN**, Van Yüzüncü Yıl Üniversitesi, İİBF Ekonometri Bölümü
+
+Sayfa: https://hanifivan.github.io/ekk-ozellikleri/
+
 Ekonometri öğrencileri için hazırlanmış, tarayıcıda çalışan interaktif bir ders notu. En küçük kareler (EKK / OLS) tahmin edicilerinin özelliklerini formüllerle değil, öğrencinin kendi çektiği Monte Carlo örnekleriyle anlatır.
 
 ## İçerik
